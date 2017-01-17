@@ -14,7 +14,8 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "mongoose": "^4.7.6",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "validator": "^6.2.1"
   },
   "devDependencies": {
     "eslint-config-rallycoding": "^3.2.0"
