@@ -1,28 +1,41 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
+import path from 'path';
+import { dbConfig, middlewaresConfig } from './config';
+
 import { urlRoute } from './modules';
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+let mongoConf;
+
+if (process.env.NODE_ENV !== 'production') {
+  const webpackMiddleware = require('webpack-dev-middleware');
+  const webpack = require('webpack');
+  const webpackConfig = require('../webpack.config');
+
+  app.use(webpackMiddleware(webpack(webpackConfig)));
+  mongoConf = 'mongodb://localhost/shorturltuto';
+} else {
+  app.use(express.static('dist'));
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist/index.html'));
+  });
+  mongoConf = process.env.MONGO_URL;
+}
+
 /*
 * DATABASE
 */
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/shorturltuto');
-mongoose.connection
-  .once('open', () => console.log('MONGODB connected'))
-  .on('error', err => console.error(err));
+dbConfig(mongoConf);
 
 /**
 * MIDDLEWARES
 */
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+middlewaresConfig(app);
 
-app.get('/', (req, res) => {
+app.get('/api/v1/hello', (req, res) => {
   res.send('Hello World!!!');
 });
 
